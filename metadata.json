@@ -1,0 +1,6 @@
+{
+  "name": "Gita Wisdom",
+  "description": "An interactive Bhagavad Gita wisdom chatbot with Gemini-inspired conversational UI, personalized seeker context, multilingual verses, daily reflections, and saved collections.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
