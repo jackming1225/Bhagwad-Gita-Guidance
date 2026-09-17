@@ -1,0 +1,118 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#140D26" />
+      <stop offset="45%" stop-color="#241442" />
+      <stop offset="80%" stop-color="#3D1845" />
+      <stop offset="100%" stop-color="#1D082A" />
+    </linearGradient>
+
+    <!-- Sacred Aura Radial Glow -->
+    <radialGradient id="auraGlow" cx="50%" cy="46%" r="45%">
+      <stop offset="0%" stop-color="#FFA726" stop-opacity="0.35" />
+      <stop offset="40%" stop-color="#FF7043" stop-opacity="0.18" />
+      <stop offset="75%" stop-color="#E91E63" stop-opacity="0.06" />
+      <stop offset="100%" stop-color="#140D26" stop-opacity="0" />
+    </radialGradient>
+
+    <!-- Golden Ring Gradient -->
+    <linearGradient id="goldRing" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF8E1" />
+      <stop offset="25%" stop-color="#FFE082" />
+      <stop offset="55%" stop-color="#FFB300" />
+      <stop offset="85%" stop-color="#FFA000" />
+      <stop offset="100%" stop-color="#FF6F00" />
+    </linearGradient>
+
+    <!-- Diya Brass Bowl Gradient -->
+    <linearGradient id="diyaBowl" x1="20%" y1="0%" x2="80%" y2="100%">
+      <stop offset="0%" stop-color="#FFF9C4" />
+      <stop offset="30%" stop-color="#FFD54F" />
+      <stop offset="70%" stop-color="#FF8F00" />
+      <stop offset="100%" stop-color="#E65100" />
+    </linearGradient>
+
+    <!-- Flame Outer Glow Gradient -->
+    <radialGradient id="flameOuter" cx="50%" cy="65%" r="55%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="25%" stop-color="#FFF9C4" />
+      <stop offset="50%" stop-color="#FFD54F" />
+      <stop offset="75%" stop-color="#FF9800" />
+      <stop offset="95%" stop-color="#E64A19" />
+      <stop offset="100%" stop-color="#D84315" stop-opacity="0" />
+    </radialGradient>
+
+    <!-- Flame Core Gradient -->
+    <linearGradient id="flameCore" x1="50%" y1="10%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="40%" stop-color="#FFFDE7" />
+      <stop offset="70%" stop-color="#FFE082" />
+      <stop offset="100%" stop-color="#FFB300" />
+    </linearGradient>
+
+    <!-- Lotus Petal Gradient (Left/Right) -->
+    <linearGradient id="petalGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFE082" stop-opacity="0.85" />
+      <stop offset="50%" stop-color="#FFB74D" stop-opacity="0.7" />
+      <stop offset="100%" stop-color="#FF7043" stop-opacity="0.5" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background Base -->
+  <rect width="512" height="512" rx="100" fill="url(#bgGrad)" />
+
+  <!-- Aura Glow Center -->
+  <circle cx="256" cy="245" r="210" fill="url(#auraGlow)" />
+
+  <!-- Sacred Geometry Subtle Mandala Rings -->
+  <circle cx="256" cy="245" r="185" fill="none" stroke="#FFE082" stroke-opacity="0.12" stroke-width="1.5" stroke-dasharray="8 6" />
+  <circle cx="256" cy="245" r="145" fill="none" stroke="#FFE082" stroke-opacity="0.18" stroke-width="1.5" />
+  <circle cx="256" cy="245" r="105" fill="none" stroke="#FFE082" stroke-opacity="0.15" stroke-width="1" stroke-dasharray="4 4" />
+
+  <!-- Radiant Light Rays behind Flame -->
+  <g opacity="0.25" stroke="#FFE57F" stroke-width="2">
+    <line x1="256" y1="110" x2="256" y2="70" />
+    <line x1="330" y1="140" x2="360" y2="110" />
+    <line x1="182" y1="140" x2="152" y2="110" />
+    <line x1="365" y1="210" x2="400" y2="200" />
+    <line x1="147" y1="210" x2="112" y2="200" />
+  </g>
+
+  <!-- LOTUS BASE FOUNDATION -->
+  <!-- Center Petal Back -->
+  <path d="M256,260 C240,300 240,335 256,355 C272,335 272,300 256,260 Z" fill="url(#petalGrad)" opacity="0.6" />
+  <!-- Left Petal 1 -->
+  <path d="M256,345 C220,345 185,320 160,290 C185,280 220,295 256,345 Z" fill="url(#petalGrad)" />
+  <!-- Right Petal 1 -->
+  <path d="M256,345 C292,345 327,320 352,290 C327,280 292,295 256,345 Z" fill="url(#petalGrad)" />
+  <!-- Outer Left Petal -->
+  <path d="M256,350 C205,360 165,340 135,310 C160,305 205,315 256,350 Z" fill="url(#petalGrad)" opacity="0.75" />
+  <!-- Outer Right Petal -->
+  <path d="M256,350 C307,360 347,340 377,310 C352,305 307,315 256,350 Z" fill="url(#petalGrad)" opacity="0.75" />
+
+  <!-- DIYA BOWL -->
+  <!-- Shadow below Diya -->
+  <ellipse cx="256" cy="352" rx="110" ry="16" fill="#0A0414" opacity="0.5" />
+  <!-- Main Brass Bowl -->
+  <path d="M146,310 C165,365 347,365 366,310 C372,295 358,290 340,295 C290,312 222,312 172,295 C154,290 140,295 146,310 Z" fill="url(#diyaBowl)" />
+  <!-- Diya Rim Highlight -->
+  <path d="M148,296 C180,312 332,312 364,296 C368,293 360,290 340,292 C290,304 222,304 172,292 C152,290 144,293 148,296 Z" fill="#FFFDE7" opacity="0.7" />
+  <!-- Diya Center Spout/Beak Dip -->
+  <ellipse cx="256" cy="302" rx="55" ry="8" fill="#E65100" opacity="0.8" />
+
+  <!-- SACRED FLAME -->
+  <!-- Outer Radiant Aura of Flame -->
+  <circle cx="256" cy="225" r="75" fill="url(#flameOuter)" opacity="0.6" />
+  <!-- Main Flame Shape -->
+  <path d="M256,130 C278,175 305,215 295,255 C285,285 227,285 217,255 C207,215 234,175 256,130 Z" fill="url(#flameOuter)" />
+  <!-- Inner Intense Golden Core Flame -->
+  <path d="M256,160 C270,195 288,225 280,250 C272,270 240,270 232,250 C224,225 242,195 256,160 Z" fill="url(#flameCore)" />
+  <!-- Pure White Heart of Flame -->
+  <path d="M256,190 C263,212 272,230 268,245 C264,258 248,258 244,245 C240,230 249,212 256,190 Z" fill="#FFFFFF" />
+
+  <!-- Divine Sparkles -->
+  <circle cx="256" cy="115" r="3" fill="#FFF9C4" />
+  <circle cx="275" cy="135" r="2" fill="#FFE082" />
+  <circle cx="238" cy="142" r="1.5" fill="#FFE082" />
+</svg>

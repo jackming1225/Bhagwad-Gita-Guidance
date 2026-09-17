@@ -60,5 +60,5 @@ We may periodically update this policy. Any changes will be reflected with an up
 
 ### 8. Contact Us
 If you have any questions, suggestions, or concerns regarding your privacy while using Gita Wisdom, please contact:
-- **Developer / Support**: Sunil Kumar
+- **Developer / Support**: Sunny Kumar
 - **Email**: sunmeh2525@gmail.com

@@ -1,0 +1,149 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 500" width="1024" height="500">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgFeat" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0F091F" />
+      <stop offset="35%" stop-color="#1D0E33" />
+      <stop offset="70%" stop-color="#311242" />
+      <stop offset="100%" stop-color="#180720" />
+    </linearGradient>
+
+    <!-- Warm Golden Light Gradient -->
+    <radialGradient id="glowRight" cx="78%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFA000" stop-opacity="0.32" />
+      <stop offset="40%" stop-color="#FF6F00" stop-opacity="0.18" />
+      <stop offset="75%" stop-color="#880E4F" stop-opacity="0.08" />
+      <stop offset="100%" stop-color="#0F091F" stop-opacity="0" />
+    </radialGradient>
+
+    <!-- Subtle Left Ambient Glow -->
+    <radialGradient id="glowLeft" cx="15%" cy="30%" r="40%">
+      <stop offset="0%" stop-color="#7B1FA2" stop-opacity="0.25" />
+      <stop offset="100%" stop-color="#0F091F" stop-opacity="0" />
+    </radialGradient>
+
+    <!-- Golden Text Gradient -->
+    <linearGradient id="goldText" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFF9C4" />
+      <stop offset="40%" stop-color="#FFD54F" />
+      <stop offset="80%" stop-color="#FFB300" />
+      <stop offset="100%" stop-color="#FFA000" />
+    </linearGradient>
+
+    <!-- Brass Diya Gradient -->
+    <linearGradient id="diyaBowlF" x1="20%" y1="0%" x2="80%" y2="100%">
+      <stop offset="0%" stop-color="#FFF9C4" />
+      <stop offset="30%" stop-color="#FFD54F" />
+      <stop offset="70%" stop-color="#FF8F00" />
+      <stop offset="100%" stop-color="#E65100" />
+    </linearGradient>
+
+    <!-- Flame Gradient -->
+    <radialGradient id="flameGradF" cx="50%" cy="65%" r="55%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="25%" stop-color="#FFF9C4" />
+      <stop offset="50%" stop-color="#FFD54F" />
+      <stop offset="80%" stop-color="#FF9800" />
+      <stop offset="100%" stop-color="#E64A19" />
+    </radialGradient>
+  </defs>
+
+  <!-- Background Base -->
+  <rect width="1024" height="500" fill="url(#bgFeat)" />
+
+  <!-- Ambient Glows -->
+  <rect width="1024" height="500" fill="url(#glowLeft)" />
+  <rect width="1024" height="500" fill="url(#glowRight)" />
+
+  <!-- Sacred Geometric Mandala Circles on the Right -->
+  <g transform="translate(780, 250)">
+    <circle cx="0" cy="0" r="190" fill="none" stroke="#FFE082" stroke-opacity="0.08" stroke-width="1.5" stroke-dasharray="10 8" />
+    <circle cx="0" cy="0" r="150" fill="none" stroke="#FFE082" stroke-opacity="0.12" stroke-width="1.5" />
+    <circle cx="0" cy="0" r="115" fill="none" stroke="#FFE082" stroke-opacity="0.10" stroke-width="1" stroke-dasharray="6 6" />
+    <circle cx="0" cy="0" r="75" fill="none" stroke="#FFE082" stroke-opacity="0.14" stroke-width="1.5" />
+
+    <!-- Lotus Petals -->
+    <path d="M0,70 C-30,70 -60,50 -80,25 C-60,15 -30,30 0,70 Z" fill="#FFA726" opacity="0.65" />
+    <path d="M0,70 C30,70 60,50 80,25 C60,15 30,30 0,70 Z" fill="#FFA726" opacity="0.65" />
+    <path d="M0,75 C-40,82 -75,65 -95,40 C-75,35 -40,45 0,75 Z" fill="#FF7043" opacity="0.5" />
+    <path d="M0,75 C40,82 75,65 95,40 C75,35 40,45 0,75 Z" fill="#FF7043" opacity="0.5" />
+
+    <!-- Diya Bowl -->
+    <path d="M-80,35 C-65,80 65,80 80,35 C85,25 75,20 60,25 C25,37 -25,37 -60,25 C-75,20 -85,25 -80,35 Z" fill="url(#diyaBowlF)" />
+    <!-- Diya Rim -->
+    <path d="M-78,25 C-50,37 50,37 78,25 C82,23 75,20 60,22 C25,32 -25,32 -60,22 C-75,20 -82,23 -78,25 Z" fill="#FFFDE7" opacity="0.8" />
+
+    <!-- Flame Aura -->
+    <circle cx="0" cy="-35" r="65" fill="url(#flameGradF)" opacity="0.3" />
+    <!-- Flame Outer -->
+    <path d="M0,-115 C18,-75 42,-40 32,-5 C24,20 -24,20 -32,-5 C-42,-40 -18,-75 0,-115 Z" fill="url(#flameGradF)" />
+    <!-- Flame Core -->
+    <path d="M0,-85 C12,-55 26,-30 20,-5 C14,10 -14,10 -20,-5 C-26,-30 -12,-55 0,-85 Z" fill="#FFF9C4" />
+    <!-- Flame Center -->
+    <path d="M0,-60 C6,-40 14,-20 10,-5 C6,5 -6,5 -10,-5 C-14,-20 -6,-40 0,-60 Z" fill="#FFFFFF" />
+
+    <!-- Sparkles -->
+    <circle cx="0" cy="-130" r="2.5" fill="#FFF9C4" />
+    <circle cx="20" cy="-110" r="2" fill="#FFE082" />
+    <circle cx="-18" cy="-105" r="1.5" fill="#FFE082" />
+  </g>
+
+  <!-- LEFT SIDE: BRANDING & TYPOGRAPHY -->
+  <!-- Subtle Sanskrit Shloka Watermark -->
+  <text x="80" y="115" font-family="sans-serif" font-size="20" fill="#FFE082" opacity="0.35" letter-spacing="2">
+    कर्मण्येवाधिकारस्ते मा फलेषु कदाचन ।
+  </text>
+
+  <!-- Main App Title -->
+  <text x="80" y="195" font-family="sans-serif" font-weight="900" font-size="64" fill="url(#goldText)" letter-spacing="1">
+    Gita Wisdom
+  </text>
+
+  <!-- Tagline / Subtitle -->
+  <text x="82" y="245" font-family="sans-serif" font-weight="500" font-size="24" fill="#F3E5F5" opacity="0.92" letter-spacing="0.5">
+    Spiritual Companion &amp; Daily Reflections
+  </text>
+
+  <!-- Descriptive Value Line -->
+  <text x="82" y="285" font-family="sans-serif" font-size="16" fill="#D1C4E9" opacity="0.75">
+    Navigate modern dilemmas with the timeless teachings of the Bhagavad Gita
+  </text>
+
+  <!-- PILL BADGES ROW -->
+  <!-- Badge 1: 12 Indian Languages -->
+  <g transform="translate(80, 340)">
+    <rect width="200" height="38" rx="19" fill="#FFB300" fill-opacity="0.16" stroke="#FFD54F" stroke-width="1.2" />
+    <text x="100" y="24" font-family="sans-serif" font-weight="600" font-size="13.5" fill="#FFE082" text-anchor="middle">
+      🌐 12 Indian Languages
+    </text>
+  </g>
+
+  <!-- Badge 2: Daily Reflections & Streaks -->
+  <g transform="translate(295, 340)">
+    <rect width="205" height="38" rx="19" fill="#BA68C8" fill-opacity="0.16" stroke="#CE93D8" stroke-width="1.2" />
+    <text x="102" y="24" font-family="sans-serif" font-weight="600" font-size="13.5" fill="#E1BEE7" text-anchor="middle">
+      📿 Daily Reflection &amp; Streaks
+    </text>
+  </g>
+
+  <!-- Badge 3: Offline-First -->
+  <g transform="translate(515, 340)">
+    <rect width="145" height="38" rx="19" fill="#26A69A" fill-opacity="0.16" stroke="#80CBC4" stroke-width="1.2" />
+    <text x="72" y="24" font-family="sans-serif" font-weight="600" font-size="13.5" fill="#B2DFDB" text-anchor="middle">
+      💾 Offline-First
+    </text>
+  </g>
+
+  <!-- Badge 4: Audio Shlokas -->
+  <g transform="translate(675, 340)">
+    <rect width="155" height="38" rx="19" fill="#FF7043" fill-opacity="0.16" stroke="#FFAB91" stroke-width="1.2" />
+    <text x="77" y="24" font-family="sans-serif" font-weight="600" font-size="13.5" fill="#FFCCBC" text-anchor="middle">
+      🔊 Sanskrit Audio
+    </text>
+  </g>
+
+  <!-- Bottom Philosophy Accent Line -->
+  <text x="82" y="440" font-family="sans-serif" font-size="14" fill="#B39DDB" opacity="0.6" letter-spacing="1">
+    No Ads • No Paywalls • 100% Private Local Storage
+  </text>
+</svg>

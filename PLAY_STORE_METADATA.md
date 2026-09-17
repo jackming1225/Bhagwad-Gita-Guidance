@@ -59,7 +59,7 @@ Begin your journey of self-discovery, calm your mind, and live with purposeful a
 
 - **Application Type**: App
 - **Category**: Books & Reference (or Lifestyle)
-- **Tags**: Bhagavad Gita, Meditation, Spirituality, Mindfulness, Daily Quotes, Sanskrit, Philosophy
+- **Developer Name**: Sunny Kumar
 - **Developer Email**: `sunmeh2525@gmail.com`
 - **Privacy Policy URL**: Host the provided `PRIVACY_POLICY.md` (e.g. on GitHub Pages, Google Sites, or a public Notion page) and paste the link here.
 
