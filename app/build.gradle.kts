@@ -61,6 +61,12 @@ android {
     includeInApk = false
     includeInBundle = true
   }
+  packaging {
+    jniLibs {
+      // Retains debug symbols for native libraries bundled with transitive dependencies (e.g. SQLite / Coroutines)
+      keepDebugSymbols.add("**/*.so")
+    }
+  }
 }
 
 // Configure the Secrets Gradle Plugin to use .env and .env.example files
