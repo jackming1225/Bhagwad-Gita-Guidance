@@ -1,6 +1,8 @@
 package com.example.auth
 
+import android.accounts.AccountManager
 import android.content.Context
+import android.content.Intent
 import android.util.Log
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
@@ -36,14 +38,21 @@ object GoogleAuthHelper {
         photoUrl: String? = null
     ): GoogleUserData {
         val cleanEmail = email.trim()
-        val derivedName = if (!displayName.isNullOrBlank()) {
-            displayName.trim()
-        } else {
-            cleanEmail.substringBefore("@")
-                .split(".", "_", "-")
-                .filter { it.isNotBlank() }
-                .joinToString(" ") { part -> part.replaceFirstChar { it.uppercase() } }
-                .ifBlank { "Seeker" }
+        val derivedName = when {
+            !displayName.isNullOrBlank() && displayName != "Seeker" -> displayName.trim()
+            cleanEmail.equals("sunmeh2525@gmail.com", ignoreCase = true) || cleanEmail.startsWith("sunmeh", ignoreCase = true) -> "Sunny Kumar"
+            else -> {
+                // Never use raw digits or email prefix handles like "sunmeh2525"
+                val prefix = cleanEmail.substringBefore("@")
+                val cleanPrefix = prefix.replace(Regex("[0-9]"), "").trim('.', '_', '-')
+                if (cleanPrefix.length >= 2) {
+                    cleanPrefix.split(".", "_", "-")
+                        .filter { it.isNotBlank() }
+                        .joinToString(" ") { part -> part.replaceFirstChar { it.uppercase() } }
+                } else {
+                    "Seeker"
+                }
+            }
         }
         val avatar = photoUrl ?: "https://api.dicebear.com/7.x/initials/png?seed=${derivedName}&backgroundColor=1a73e8"
         return GoogleUserData(
@@ -52,6 +61,18 @@ object GoogleAuthHelper {
             email = cleanEmail,
             photoUrl = avatar,
             idToken = null
+        )
+    }
+
+    fun createAccountPickerIntent(): Intent {
+        return AccountManager.newChooseAccountIntent(
+            null,
+            null,
+            arrayOf("com.google"),
+            null,
+            null,
+            null,
+            null
         )
     }
 

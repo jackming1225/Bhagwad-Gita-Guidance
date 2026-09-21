@@ -1,6 +1,11 @@
 package com.example.ui.components
 
+import android.accounts.AccountManager
+import android.app.Activity
+import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -100,12 +105,16 @@ fun UserProfileDialog(
     val coroutineScope = rememberCoroutineScope()
     val strings = com.example.ui.util.GitaUiTranslations.get(selectedLanguage)
 
-    val isLegacyDev = initialProfile.name.equals("Sunil", ignoreCase = true) ||
-            initialProfile.name.equals("Sunny Kumar", ignoreCase = true) ||
-            initialProfile.email.contains("sunmeh", ignoreCase = true)
-
     var name by remember {
-        mutableStateOf(if (isLegacyDev) "Seeker" else initialProfile.name)
+        mutableStateOf(
+            if (initialProfile.name.isNotBlank() && initialProfile.name != "Seeker") {
+                initialProfile.name
+            } else if (initialProfile.email.equals("sunmeh2525@gmail.com", ignoreCase = true) || initialProfile.email.startsWith("sunmeh", ignoreCase = true)) {
+                "Sunny Kumar"
+            } else {
+                initialProfile.name.ifBlank { "Seeker" }
+            }
+        )
     }
     var selectedRole by remember { mutableStateOf(initialProfile.role) }
     var selectedFocus by remember { mutableStateOf(initialProfile.primaryFocus) }
@@ -113,18 +122,45 @@ fun UserProfileDialog(
     var personalNotes by remember { mutableStateOf(initialProfile.personalNotes) }
 
     var isGoogleLinked by remember {
-        mutableStateOf(if (isLegacyDev) false else initialProfile.isGoogleLinked)
+        mutableStateOf(initialProfile.isGoogleLinked)
     }
     var googleEmail by remember {
-        mutableStateOf(if (isLegacyDev) "" else initialProfile.email)
+        mutableStateOf(initialProfile.email)
     }
     var photoUrl by remember {
-        mutableStateOf(if (isLegacyDev) null else initialProfile.photoUrl)
+        mutableStateOf(initialProfile.photoUrl)
     }
     var isSigningInWithGoogle by remember { mutableStateOf(false) }
     var isShowingCustomEmailInput by remember { mutableStateOf(false) }
     var customEmailInput by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+
+    val accountPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        isSigningInWithGoogle = false
+        if (result.resultCode == Activity.RESULT_OK && result.data != null) {
+            val accountName = result.data?.getStringExtra(AccountManager.KEY_ACCOUNT_NAME)
+            if (!accountName.isNullOrBlank()) {
+                val preferredName = when {
+                    accountName.equals("sunmeh2525@gmail.com", ignoreCase = true) || accountName.startsWith("sunmeh", ignoreCase = true) -> "Sunny Kumar"
+                    name.isNotBlank() && name != "Seeker" && !name.contains("@") && !name.contains(Regex("\\d")) -> name
+                    else -> null
+                }
+                val user = GoogleAuthHelper.createGoogleUser(
+                    email = accountName,
+                    displayName = preferredName
+                )
+                isGoogleLinked = true
+                name = user.displayName
+                googleEmail = user.email
+                photoUrl = user.photoUrl
+                onLinkGoogle(user)
+                Toast.makeText(context, "Welcome, ${user.displayName}!", Toast.LENGTH_SHORT).show()
+                errorMessage = null
+            }
+        }
+    }
 
     Dialog(
         onDismissRequest = onDismiss,
@@ -307,34 +343,34 @@ fun UserProfileDialog(
 
                             Spacer(modifier = Modifier.height(14.dp))
 
-                            // Primary Credential Manager Button
+                            // Primary Google Account Selection Button
                             Button(
                                 onClick = {
                                     isSigningInWithGoogle = true
                                     errorMessage = null
-                                    coroutineScope.launch {
-                                        when (val result = GoogleAuthHelper.signInWithGoogle(context)) {
-                                            is GoogleAuthResult.Success -> {
-                                                isSigningInWithGoogle = false
-                                                isGoogleLinked = true
-                                                name = result.user.displayName
-                                                googleEmail = result.user.email
-                                                photoUrl = result.user.photoUrl
-                                                onLinkGoogle(result.user)
-                                                Toast.makeText(context, "Welcome, ${result.user.displayName}!", Toast.LENGTH_SHORT).show()
-                                            }
-                                            is GoogleAuthResult.FallbackRequired -> {
-                                                isSigningInWithGoogle = false
-                                                errorMessage = "Google Play Services account picker not available on this device: ${result.reason}. You can link an email below or enter your name directly."
-                                                isShowingCustomEmailInput = true
-                                            }
-                                            is GoogleAuthResult.Cancelled -> {
-                                                isSigningInWithGoogle = false
-                                            }
-                                            is GoogleAuthResult.Error -> {
-                                                isSigningInWithGoogle = false
-                                                errorMessage = result.message
-                                                Toast.makeText(context, "Google Sign-In: ${result.message}", Toast.LENGTH_LONG).show()
+                                    try {
+                                        val intent = GoogleAuthHelper.createAccountPickerIntent()
+                                        accountPickerLauncher.launch(intent)
+                                    } catch (e: Exception) {
+                                        Log.e("UserProfileDialog", "System Account Picker intent failed, falling back", e)
+                                        coroutineScope.launch {
+                                            when (val result = GoogleAuthHelper.signInWithGoogle(context)) {
+                                                is GoogleAuthResult.Success -> {
+                                                    isSigningInWithGoogle = false
+                                                    isGoogleLinked = true
+                                                    name = result.user.displayName
+                                                    googleEmail = result.user.email
+                                                    photoUrl = result.user.photoUrl
+                                                    onLinkGoogle(result.user)
+                                                    Toast.makeText(context, "Welcome, ${result.user.displayName}!", Toast.LENGTH_SHORT).show()
+                                                }
+                                                is GoogleAuthResult.FallbackRequired, is GoogleAuthResult.Error -> {
+                                                    isSigningInWithGoogle = false
+                                                    isShowingCustomEmailInput = true
+                                                }
+                                                is GoogleAuthResult.Cancelled -> {
+                                                    isSigningInWithGoogle = false
+                                                }
                                             }
                                         }
                                     }
@@ -410,7 +446,15 @@ fun UserProfileDialog(
                                             onClick = {
                                                 val clean = customEmailInput.trim()
                                                 if (clean.isNotBlank() && clean.contains("@")) {
-                                                    val user = GoogleAuthHelper.createGoogleUser(email = clean)
+                                                    val preferredName = when {
+                                                        clean.equals("sunmeh2525@gmail.com", ignoreCase = true) || clean.startsWith("sunmeh", ignoreCase = true) -> "Sunny Kumar"
+                                                        name.isNotBlank() && name != "Seeker" && !name.contains("@") && !name.contains(Regex("\\d")) -> name
+                                                        else -> null
+                                                    }
+                                                    val user = GoogleAuthHelper.createGoogleUser(
+                                                        email = clean,
+                                                        displayName = preferredName
+                                                    )
                                                     isGoogleLinked = true
                                                     name = user.displayName
                                                     googleEmail = user.email
