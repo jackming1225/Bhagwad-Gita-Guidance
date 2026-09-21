@@ -90,6 +90,7 @@ val GUIDANCE_TONES = listOf(
 @Composable
 fun UserProfileDialog(
     initialProfile: UserProfileEntity,
+    selectedLanguage: com.example.data.model.GitaLanguage = com.example.data.model.GitaLanguage.ENGLISH,
     onSaveProfile: (UserProfileEntity) -> Unit,
     onLinkGoogle: (GoogleUserData) -> Unit = {},
     onUnlinkGoogle: () -> Unit = {},
@@ -97,17 +98,32 @@ fun UserProfileDialog(
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
+    val strings = com.example.ui.util.GitaUiTranslations.get(selectedLanguage)
 
-    var name by remember { mutableStateOf(initialProfile.name) }
+    val isLegacyDev = initialProfile.name.equals("Sunil", ignoreCase = true) ||
+            initialProfile.name.equals("Sunny Kumar", ignoreCase = true) ||
+            initialProfile.email.contains("sunmeh", ignoreCase = true)
+
+    var name by remember {
+        mutableStateOf(if (isLegacyDev) "Seeker" else initialProfile.name)
+    }
     var selectedRole by remember { mutableStateOf(initialProfile.role) }
     var selectedFocus by remember { mutableStateOf(initialProfile.primaryFocus) }
     var selectedTone by remember { mutableStateOf(initialProfile.guidanceTone) }
     var personalNotes by remember { mutableStateOf(initialProfile.personalNotes) }
 
-    var isGoogleLinked by remember { mutableStateOf(initialProfile.isGoogleLinked) }
-    var googleEmail by remember { mutableStateOf(initialProfile.email) }
-    var photoUrl by remember { mutableStateOf(initialProfile.photoUrl) }
+    var isGoogleLinked by remember {
+        mutableStateOf(if (isLegacyDev) false else initialProfile.isGoogleLinked)
+    }
+    var googleEmail by remember {
+        mutableStateOf(if (isLegacyDev) "" else initialProfile.email)
+    }
+    var photoUrl by remember {
+        mutableStateOf(if (isLegacyDev) null else initialProfile.photoUrl)
+    }
     var isSigningInWithGoogle by remember { mutableStateOf(false) }
+    var isShowingCustomEmailInput by remember { mutableStateOf(false) }
+    var customEmailInput by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
     Dialog(
@@ -246,6 +262,9 @@ fun UserProfileDialog(
                                         isGoogleLinked = false
                                         googleEmail = ""
                                         photoUrl = null
+                                        if (name == "Sunny Kumar" || name == "Sunil" || name.contains("@")) {
+                                            name = "Seeker"
+                                        }
                                         onUnlinkGoogle()
                                         Toast.makeText(context, "Google profile disconnected", Toast.LENGTH_SHORT).show()
                                     },
@@ -279,7 +298,7 @@ fun UserProfileDialog(
                                         color = MaterialTheme.colorScheme.onSurface
                                     )
                                     Text(
-                                        text = "One-tap sign in to personalize your seeker journey",
+                                        text = "Sign in with your Google account to personalize your journey",
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
@@ -306,17 +325,8 @@ fun UserProfileDialog(
                                             }
                                             is GoogleAuthResult.FallbackRequired -> {
                                                 isSigningInWithGoogle = false
-                                                // Automatically link the primary developer/user Google account
-                                                val user = GoogleAuthHelper.createGoogleUser(
-                                                    email = "sunmeh2525@gmail.com",
-                                                    displayName = "Sunny Kumar"
-                                                )
-                                                isGoogleLinked = true
-                                                name = user.displayName
-                                                googleEmail = user.email
-                                                photoUrl = user.photoUrl
-                                                onLinkGoogle(user)
-                                                Toast.makeText(context, "Signed in as Sunny Kumar (${user.email})", Toast.LENGTH_SHORT).show()
+                                                errorMessage = "Google Play Services account picker not available on this device: ${result.reason}. You can link an email below or enter your name directly."
+                                                isShowingCustomEmailInput = true
                                             }
                                             is GoogleAuthResult.Cancelled -> {
                                                 isSigningInWithGoogle = false
@@ -362,66 +372,62 @@ fun UserProfileDialog(
                                 }
                             }
 
-                            Spacer(modifier = Modifier.height(10.dp))
+                            Spacer(modifier = Modifier.height(8.dp))
 
-                            // One-tap Quick Account Card for Sunny Kumar
-                            Surface(
-                                shape = RoundedCornerShape(16.dp),
-                                color = MaterialTheme.colorScheme.surface,
-                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.25f)),
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable {
-                                        val user = GoogleAuthHelper.createGoogleUser(
-                                            email = "sunmeh2525@gmail.com",
-                                            displayName = "Sunny Kumar"
-                                        )
-                                        isGoogleLinked = true
-                                        name = user.displayName
-                                        googleEmail = user.email
-                                        photoUrl = user.photoUrl
-                                        onLinkGoogle(user)
-                                        Toast.makeText(context, "Connected as ${user.displayName}!", Toast.LENGTH_SHORT).show()
-                                    }
-                                    .testTag("quick_google_account_card")
-                            ) {
-                                Row(
-                                    modifier = Modifier.padding(12.dp),
-                                    verticalAlignment = Alignment.CenterVertically
+                            // Generic Custom Email Link Option (for emulators or alternative emails)
+                            if (!isShowingCustomEmailInput) {
+                                TextButton(
+                                    onClick = { isShowingCustomEmailInput = true },
+                                    modifier = Modifier.fillMaxWidth()
                                 ) {
-                                    Box(
-                                        modifier = Modifier
-                                            .size(36.dp)
-                                            .clip(CircleShape)
-                                            .background(Color(0xFF4285F4)),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Text(
-                                            text = "S",
-                                            color = Color.White,
-                                            fontWeight = FontWeight.Bold,
-                                            fontSize = 16.sp
-                                        )
-                                    }
-                                    Spacer(modifier = Modifier.width(10.dp))
-                                    Column(modifier = Modifier.weight(1f)) {
-                                        Text(
-                                            text = "Sunny Kumar",
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            fontWeight = FontWeight.Bold
-                                        )
-                                        Text(
-                                            text = "sunmeh2525@gmail.com",
-                                            style = MaterialTheme.typography.bodySmall,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
-                                    }
                                     Text(
-                                        text = "1-Tap Sign In",
-                                        style = MaterialTheme.typography.labelSmall,
-                                        fontWeight = FontWeight.Bold,
+                                        text = "Or link with email address",
+                                        style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.primary
                                     )
+                                }
+                            } else {
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(top = 4.dp)
+                                ) {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        OutlinedTextField(
+                                            value = customEmailInput,
+                                            onValueChange = { customEmailInput = it },
+                                            placeholder = { Text("your.email@example.com") },
+                                            singleLine = true,
+                                            shape = RoundedCornerShape(14.dp),
+                                            modifier = Modifier.weight(1f),
+                                            textStyle = MaterialTheme.typography.bodyMedium
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Button(
+                                            onClick = {
+                                                val clean = customEmailInput.trim()
+                                                if (clean.isNotBlank() && clean.contains("@")) {
+                                                    val user = GoogleAuthHelper.createGoogleUser(email = clean)
+                                                    isGoogleLinked = true
+                                                    name = user.displayName
+                                                    googleEmail = user.email
+                                                    photoUrl = user.photoUrl
+                                                    onLinkGoogle(user)
+                                                    Toast.makeText(context, "Linked as ${user.displayName}!", Toast.LENGTH_SHORT).show()
+                                                    isShowingCustomEmailInput = false
+                                                    errorMessage = null
+                                                } else {
+                                                    errorMessage = "Please enter a valid email address."
+                                                }
+                                            },
+                                            shape = RoundedCornerShape(14.dp)
+                                        ) {
+                                            Text("Link")
+                                        }
+                                    }
                                 }
                             }
 
@@ -450,7 +456,7 @@ fun UserProfileDialog(
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
-                    placeholder = { Text("e.g. Sunil, Arjuna, Seeker") },
+                    placeholder = { Text("e.g. Arjuna, Ananya, Seeker") },
                     modifier = Modifier
                         .fillMaxWidth()
                         .testTag("profile_name_input"),

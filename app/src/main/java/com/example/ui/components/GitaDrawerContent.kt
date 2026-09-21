@@ -55,6 +55,7 @@ import coil.compose.AsyncImage
 import com.example.R
 import com.example.data.local.UserProfileEntity
 import com.example.data.model.GitaLanguage
+import com.example.ui.util.GitaUiTranslations
 
 @Composable
 fun GitaDrawerContent(
@@ -69,6 +70,8 @@ fun GitaDrawerContent(
     onCloseDrawer: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val strings = GitaUiTranslations.get(selectedLanguage)
+
     Column(
         modifier = modifier
             .fillMaxHeight()
@@ -85,13 +88,13 @@ fun GitaDrawerContent(
             Spacer(modifier = Modifier.width(12.dp))
             Column {
                 Text(
-                    text = "Gita Wisdom",
+                    text = strings.drawerTitle,
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
-                    text = "Timeless Divine Guidance",
+                    text = strings.drawerSubtitle,
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.SemiBold
@@ -188,7 +191,7 @@ fun GitaDrawerContent(
         Spacer(modifier = Modifier.height(18.dp))
 
         Text(
-            text = "NAVIGATION",
+            text = strings.drawerNavHeading,
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             fontWeight = FontWeight.Bold,
@@ -198,8 +201,8 @@ fun GitaDrawerContent(
 
         // Main Navigation Destinations
         DrawerNavItem(
-            label = "Guidance Chat",
-            subtitle = "Ask Krishna your dilemmas",
+            label = strings.drawerGuidanceChat,
+            subtitle = strings.drawerGuidanceSub,
             icon = if (currentTab == 0) Icons.Filled.AutoAwesome else Icons.Outlined.AutoAwesome,
             selected = currentTab == 0,
             onClick = {
@@ -210,8 +213,8 @@ fun GitaDrawerContent(
         )
 
         DrawerNavItem(
-            label = "Daily Darshan",
-            subtitle = "Verse of the day & streak",
+            label = strings.drawerDailyDarshan,
+            subtitle = strings.drawerDailyDarshanSub,
             icon = if (currentTab == 1) Icons.Filled.WbSunny else Icons.Outlined.WbSunny,
             selected = currentTab == 1,
             onClick = {
@@ -222,8 +225,8 @@ fun GitaDrawerContent(
         )
 
         DrawerNavItem(
-            label = "Saved Collections",
-            subtitle = "Your bookmarked verses",
+            label = strings.drawerSavedCollections,
+            subtitle = strings.drawerSavedCollectionsSub,
             icon = if (currentTab == 2) Icons.Filled.Bookmarks else Icons.Outlined.Bookmarks,
             selected = currentTab == 2,
             onClick = {
@@ -234,8 +237,8 @@ fun GitaDrawerContent(
         )
 
         DrawerNavItem(
-            label = "Meditate",
-            subtitle = "Pranayama & focus bell",
+            label = strings.drawerMeditate,
+            subtitle = strings.drawerMeditateSub,
             icon = if (currentTab == 3) Icons.Filled.SelfImprovement else Icons.Outlined.SelfImprovement,
             selected = currentTab == 3,
             onClick = {
@@ -246,8 +249,8 @@ fun GitaDrawerContent(
         )
 
         DrawerNavItem(
-            label = "Support the Seva",
-            subtitle = "Offer Dakshina (Keep lamp burning)",
+            label = strings.drawerSupportSeva,
+            subtitle = strings.drawerSupportSevaSub,
             icon = Icons.Filled.Spa,
             selected = false,
             onClick = {
@@ -262,7 +265,7 @@ fun GitaDrawerContent(
         Spacer(modifier = Modifier.height(14.dp))
 
         Text(
-            text = "PREFERENCES",
+            text = strings.drawerPrefHeading,
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             fontWeight = FontWeight.Bold,
@@ -296,7 +299,7 @@ fun GitaDrawerContent(
                 Spacer(modifier = Modifier.width(14.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Language",
+                        text = strings.drawerLanguage,
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.onSurface
@@ -336,13 +339,13 @@ fun GitaDrawerContent(
                 Spacer(modifier = Modifier.width(14.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Reset Conversation",
+                        text = strings.drawerClearChat,
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.error
                     )
                     Text(
-                        text = "Start fresh with Krishna",
+                        text = strings.clearChatConfirmTitle,
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

@@ -56,19 +56,24 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.data.model.GitaLanguage
+import com.example.ui.util.GitaUiTranslations
 import kotlinx.coroutines.delay
 
-enum class BreathPhase(val instruction: String, val gitaMantra: String, val durationMs: Long) {
-    INHALE("Inhale Peace & Prana", "Receive the divine breath of life", 4000L),
-    HOLD_IN("Hold Gently", "Rest in the unchanging stillness within", 4000L),
-    EXHALE("Exhale All Anxiety", "Surrender fruits and burdens to Krishna", 4000L),
-    HOLD_OUT("Rest in Stillness", "You are eternal, unmoving consciousness", 2000L)
+enum class BreathPhase(val durationMs: Long) {
+    INHALE(4000L),
+    HOLD_IN(4000L),
+    EXHALE(4000L),
+    HOLD_OUT(2000L)
 }
 
 @Composable
 fun MeditationScreen(
+    selectedLanguage: GitaLanguage = GitaLanguage.ENGLISH,
     modifier: Modifier = Modifier
 ) {
+    val strings = GitaUiTranslations.get(selectedLanguage)
+
     var isRunning by remember { mutableStateOf(false) }
     var phaseIndex by remember { mutableIntStateOf(0) }
     var selectedDurationMinutes by remember { mutableIntStateOf(3) }
@@ -76,6 +81,20 @@ fun MeditationScreen(
 
     val phases = BreathPhase.entries
     val currentPhase = phases[phaseIndex]
+
+    val phaseInstruction = when (currentPhase) {
+        BreathPhase.INHALE -> strings.breathInhale
+        BreathPhase.HOLD_IN -> strings.breathHold
+        BreathPhase.EXHALE -> strings.breathExhale
+        BreathPhase.HOLD_OUT -> strings.breathRest
+    }
+
+    val phaseMantra = when (currentPhase) {
+        BreathPhase.INHALE -> strings.breathInhaleSub
+        BreathPhase.HOLD_IN -> strings.breathHoldSub
+        BreathPhase.EXHALE -> strings.breathExhaleSub
+        BreathPhase.HOLD_OUT -> strings.breathRestSub
+    }
 
     // Breathing circle scale animation
     val targetScale = when (currentPhase) {
@@ -143,13 +162,13 @@ fun MeditationScreen(
         // Title
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                text = "Meditative Sanctuary",
+                text = strings.meditationTitle,
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface
             )
             Text(
-                text = "Pranayama breath contemplation with Bhagavad Gita truths",
+                text = strings.meditationSubtitle,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -178,7 +197,7 @@ fun MeditationScreen(
                         .testTag("timer_chip_${mins}m")
                 ) {
                     Text(
-                        text = "$mins Min",
+                        text = "$mins m",
                         style = MaterialTheme.typography.labelMedium,
                         fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
                         color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface,
@@ -250,7 +269,7 @@ fun MeditationScreen(
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = if (isRunning) currentPhase.instruction else "Tap Start",
+                    text = if (isRunning) phaseInstruction else strings.startMeditation,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface,
@@ -258,7 +277,7 @@ fun MeditationScreen(
                 )
                 if (isRunning) {
                     Text(
-                        text = currentPhase.gitaMantra,
+                        text = phaseMantra,
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontSize = 11.sp,
@@ -296,7 +315,7 @@ fun MeditationScreen(
             ) {
                 Icon(
                     imageVector = Icons.Default.Refresh,
-                    contentDescription = "Reset",
+                    contentDescription = strings.resetMeditation,
                     tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
@@ -318,7 +337,7 @@ fun MeditationScreen(
             ) {
                 Icon(
                     imageVector = if (isRunning) Icons.Default.Pause else Icons.Default.PlayArrow,
-                    contentDescription = if (isRunning) "Pause" else "Start",
+                    contentDescription = if (isRunning) strings.pauseMeditation else strings.startMeditation,
                     modifier = Modifier.size(32.dp)
                 )
             }
@@ -342,7 +361,7 @@ fun MeditationScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Truth to Contemplate while Breathing",
+                    text = strings.contemplationPrompt,
                     style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary

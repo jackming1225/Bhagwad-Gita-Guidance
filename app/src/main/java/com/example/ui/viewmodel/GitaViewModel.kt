@@ -81,11 +81,27 @@ class GitaViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             repository.userProfile.collect { profile ->
                 if (profile != null) {
-                    _userProfile.value = profile
+                    val isLegacyDev = profile.name.equals("Sunil", ignoreCase = true) ||
+                            profile.name.equals("Sunny Kumar", ignoreCase = true) ||
+                            profile.email.contains("sunmeh", ignoreCase = true)
+                    if (isLegacyDev) {
+                        val generalProfile = profile.copy(
+                            name = "Seeker",
+                            role = "Seeker of Wisdom",
+                            email = "",
+                            photoUrl = null,
+                            isGoogleLinked = false,
+                            googleId = null
+                        )
+                        repository.saveUserProfile(generalProfile)
+                        _userProfile.value = generalProfile
+                    } else {
+                        _userProfile.value = profile
+                    }
                 } else {
                     val defaultProfile = UserProfileEntity(
-                        name = "Sunil",
-                        role = "Working Professional",
+                        name = "Seeker",
+                        role = "Seeker of Wisdom",
                         primaryFocus = "Inner Peace & Stress Relief",
                         guidanceTone = "Empathetic & Practical"
                     )
@@ -107,7 +123,7 @@ class GitaViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             val current = _userProfile.value
             val updated = current.copy(
-                name = if (current.name.isBlank() || current.name == "Seeker" || current.name == "Sunil") user.displayName else current.name,
+                name = if (current.name.isBlank() || current.name == "Seeker" || current.name.equals("Sunil", ignoreCase = true)) user.displayName else current.name,
                 email = user.email,
                 photoUrl = user.photoUrl,
                 isGoogleLinked = true,
@@ -123,6 +139,7 @@ class GitaViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             val current = _userProfile.value
             val updated = current.copy(
+                name = if (current.name.isBlank() || current.name == current.email || current.name.equals("Sunil", ignoreCase = true) || current.name.equals("Sunny Kumar", ignoreCase = true)) "Seeker" else current.name,
                 email = "",
                 photoUrl = null,
                 isGoogleLinked = false,

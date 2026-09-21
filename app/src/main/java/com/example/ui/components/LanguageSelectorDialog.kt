@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.data.model.GitaLanguage
+import com.example.ui.util.GitaUiTranslations
 
 @Composable
 fun LanguageSelectorDialog(
@@ -47,6 +48,8 @@ fun LanguageSelectorDialog(
     onLanguageSelected: (GitaLanguage) -> Unit,
     onDismiss: () -> Unit
 ) {
+    val strings = GitaUiTranslations.get(currentLanguage)
+
     Dialog(
         onDismissRequest = onDismiss,
         properties = DialogProperties(usePlatformDefaultWidth = false)
@@ -89,7 +92,7 @@ fun LanguageSelectorDialog(
                     Spacer(modifier = Modifier.width(12.dp))
                     Column {
                         Text(
-                            text = "Select Language",
+                            text = strings.drawerLanguage,
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface
@@ -105,7 +108,7 @@ fun LanguageSelectorDialog(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "Experience Gita's teachings in your native mother tongue or sacred Sanskrit:",
+                    text = strings.drawerSubtitle,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     lineHeight = 18.sp
@@ -181,7 +184,7 @@ fun LanguageSelectorDialog(
                         onClick = onDismiss,
                         modifier = Modifier.testTag("dismiss_language_dialog")
                     ) {
-                        Text("Done", color = MaterialTheme.colorScheme.primary)
+                        Text(strings.confirm, color = MaterialTheme.colorScheme.primary)
                     }
                 }
             }

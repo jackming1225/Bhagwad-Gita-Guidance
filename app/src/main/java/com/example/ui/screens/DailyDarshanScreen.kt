@@ -53,6 +53,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ui.components.VerseCard
+import com.example.ui.util.GitaUiTranslations
 import com.example.ui.viewmodel.GitaViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -71,6 +72,8 @@ fun DailyDarshanScreen(
     val favorites by viewModel.favorites.collectAsState()
     val isSpeaking by viewModel.isSpeaking.collectAsState()
     val currentUtteranceId by viewModel.currentUtteranceId.collectAsState()
+
+    val strings = GitaUiTranslations.get(selectedLanguage)
 
     var reflectionNoteText by remember(todayReflection) {
         mutableStateOf(todayReflection?.userReflectionNote ?: "")
@@ -115,7 +118,7 @@ fun DailyDarshanScreen(
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Daily Gita Darshan",
+                        text = strings.drawerDailyDarshan,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary
@@ -144,7 +147,7 @@ fun DailyDarshanScreen(
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = "$streak Contemplated",
+                            text = "$streak ${strings.daysCompleted}",
                             style = MaterialTheme.typography.labelMedium,
                             fontWeight = FontWeight.Bold,
                             color = Color.White
@@ -156,7 +159,7 @@ fun DailyDarshanScreen(
 
         // Verse of the Day
         Text(
-            text = "✨ Today's Sacred Verse",
+            text = strings.todayVerseHeading,
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface
@@ -168,6 +171,7 @@ fun DailyDarshanScreen(
             transliteration = todayVerse.transliteration,
             translation = todayVerse.getTranslation(selectedLanguage),
             theme = todayVerse.lifeTheme,
+            selectedLanguage = selectedLanguage,
             isFavorited = favorites.any { it.citation == todayVerse.citation },
             isSpeaking = isSpeaking && currentUtteranceId == "daily_${todayVerse.citation}",
             onToggleFavorite = {
@@ -208,7 +212,7 @@ fun DailyDarshanScreen(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Contemplation Prompt",
+                        text = strings.contemplationPrompt,
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary
@@ -234,7 +238,7 @@ fun DailyDarshanScreen(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Mindful Intention for Today",
+                        text = strings.mindfulIntention,
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.secondary
@@ -264,13 +268,13 @@ fun DailyDarshanScreen(
         ) {
             Column(modifier = Modifier.padding(18.dp)) {
                 Text(
-                    text = "Personal Reflection Journal",
+                    text = strings.journalHeading,
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
-                    text = "Write your thoughts on how this teaching speaks to your life today:",
+                    text = strings.drawerDailyDarshanSub,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -282,7 +286,7 @@ fun DailyDarshanScreen(
                     onValueChange = { reflectionNoteText = it },
                     placeholder = {
                         Text(
-                            "e.g., Today I will let go of worrying about the outcome of my presentation...",
+                            strings.journalPlaceholder,
                             style = MaterialTheme.typography.bodySmall
                         )
                     },
@@ -303,7 +307,7 @@ fun DailyDarshanScreen(
                 Button(
                     onClick = {
                         viewModel.completeDailyReflection(reflectionNoteText)
-                        Toast.makeText(context, "Reflection saved! Streak updated.", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, strings.journalSavedToast, Toast.LENGTH_SHORT).show()
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = if (isCompleted) Color(0xFF2E7D32) else MaterialTheme.colorScheme.primary
@@ -320,7 +324,7 @@ fun DailyDarshanScreen(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = if (isCompleted) "Reflection Completed ✨ (Update)" else "Save & Complete Reflection",
+                        text = if (isCompleted) strings.doneForToday else strings.saveJournal,
                         fontWeight = FontWeight.SemiBold
                     )
                 }
@@ -345,7 +349,7 @@ fun DailyDarshanScreen(
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = "Chat with Krishna about this Verse",
+                text = "${strings.navGuidance}: ${todayVerse.citation}",
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.SemiBold
             )

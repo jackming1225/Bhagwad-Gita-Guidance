@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.data.local.UserProfileEntity
 import com.example.data.model.GitaLanguage
+import com.example.ui.util.GitaUiTranslations
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,6 +54,8 @@ fun GitaTopBar(
     showClearChat: Boolean = false,
     onClearChat: () -> Unit = {}
 ) {
+    val strings = GitaUiTranslations.get(selectedLanguage)
+
     TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.surface,
@@ -99,7 +102,7 @@ fun GitaTopBar(
                 Spacer(modifier = Modifier.width(10.dp))
                 Column(verticalArrangement = Arrangement.Center) {
                     Text(
-                        text = "Gita AI",
+                        text = strings.topBarTitle,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 0.3.sp,
@@ -117,7 +120,7 @@ fun GitaTopBar(
                         )
                         Spacer(modifier = Modifier.width(5.dp))
                         Text(
-                            text = "Shri Krishna is online",
+                            text = strings.topBarOnline,
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontSize = 11.sp,
@@ -145,7 +148,7 @@ fun GitaTopBar(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Translate,
-                        contentDescription = "Language",
+                        contentDescription = strings.drawerLanguage,
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(16.dp)
                     )
@@ -203,7 +206,7 @@ fun GitaTopBar(
                 ) {
                     Icon(
                         imageVector = Icons.Default.DeleteOutline,
-                        contentDescription = "Clear Chat",
+                        contentDescription = strings.clearChat,
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }

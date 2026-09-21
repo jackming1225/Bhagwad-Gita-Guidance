@@ -64,6 +64,7 @@ fun VerseCard(
     transliteration: String? = null,
     translation: String,
     theme: String? = null,
+    selectedLanguage: GitaLanguage = GitaLanguage.ENGLISH,
     isFavorited: Boolean = false,
     isSpeaking: Boolean = false,
     onToggleFavorite: () -> Unit = {},

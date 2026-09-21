@@ -59,18 +59,23 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.local.FavoriteVerseEntity
+import com.example.data.model.GitaLanguage
 import com.example.data.wisdom.GitaWisdomRepository
+import com.example.ui.util.GitaUiTranslations
 import com.example.ui.viewmodel.GitaViewModel
 
 @Composable
 fun CollectionScreen(
     viewModel: GitaViewModel,
+    selectedLanguage: GitaLanguage = GitaLanguage.ENGLISH,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
     val favorites by viewModel.favorites.collectAsState()
     val isSpeaking by viewModel.isSpeaking.collectAsState()
     val currentUtteranceId by viewModel.currentUtteranceId.collectAsState()
+
+    val strings = GitaUiTranslations.get(selectedLanguage)
 
     var searchQuery by remember { mutableStateOf("") }
 
@@ -102,13 +107,13 @@ fun CollectionScreen(
         ) {
             Column {
                 Text(
-                    text = "Personal Collection",
+                    text = strings.collectionsTitle,
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
-                    text = "${favorites.size} verses saved for contemplation",
+                    text = "${favorites.size} ${strings.collectionsSub}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -137,7 +142,7 @@ fun CollectionScreen(
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
-                placeholder = { Text("Search your saved verses...") },
+                placeholder = { Text(strings.searchPlaceholder) },
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Search,
@@ -189,7 +194,7 @@ fun CollectionScreen(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Text(
-                        text = "Your Collection is Empty",
+                        text = strings.emptyCollectionTitle,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface
@@ -198,7 +203,7 @@ fun CollectionScreen(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Text(
-                        text = "Whenever a teaching in the chat or daily darshan touches your heart, tap the bookmark icon to keep it here in your sacred collection.",
+                        text = strings.emptyCollectionDesc,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center,
@@ -212,7 +217,7 @@ fun CollectionScreen(
                         shape = RoundedCornerShape(16.dp),
                         modifier = Modifier.testTag("go_to_chat_from_collection")
                     ) {
-                        Text("Explore Gita Guidance")
+                        Text(strings.exploreGuidanceBtn)
                     }
                 }
             }
@@ -224,6 +229,7 @@ fun CollectionScreen(
                 items(filteredFavorites, key = { it.id }) { item ->
                     FavoriteVerseCardItem(
                         item = item,
+                        selectedLanguage = selectedLanguage,
                         isSpeaking = isSpeaking && currentUtteranceId == "fav_${item.id}",
                         onPlayAudio = {
                             viewModel.speakVerse(
@@ -234,7 +240,7 @@ fun CollectionScreen(
                         onStopAudio = { viewModel.stopSpeaking() },
                         onRemove = {
                             viewModel.removeFavorite(item.id)
-                            Toast.makeText(context, "Removed from collection", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "${item.citation} - ${strings.clearChat}", Toast.LENGTH_SHORT).show()
                         },
                         onDiscussInChat = {
                             val verseObj = GitaWisdomRepository.getVerseByCitation(item.citation)
@@ -255,6 +261,7 @@ fun CollectionScreen(
 @Composable
 fun FavoriteVerseCardItem(
     item: FavoriteVerseEntity,
+    selectedLanguage: GitaLanguage = GitaLanguage.ENGLISH,
     isSpeaking: Boolean,
     onPlayAudio: () -> Unit,
     onStopAudio: () -> Unit,
@@ -262,6 +269,7 @@ fun FavoriteVerseCardItem(
     onDiscussInChat: () -> Unit
 ) {
     val context = LocalContext.current
+    val strings = GitaUiTranslations.get(selectedLanguage)
 
     Card(
         shape = RoundedCornerShape(20.dp),
@@ -351,7 +359,7 @@ fun FavoriteVerseCardItem(
                 ) {
                     Icon(
                         imageVector = if (isSpeaking) Icons.Default.Pause else Icons.Default.VolumeUp,
-                        contentDescription = "Listen",
+                        contentDescription = if (isSpeaking) strings.stopAudio else strings.listenAudio,
                         modifier = Modifier.size(20.dp)
                     )
                 }
@@ -362,7 +370,7 @@ fun FavoriteVerseCardItem(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Chat,
-                            contentDescription = "Discuss in Chat",
+                            contentDescription = strings.navGuidance,
                             tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(20.dp)
                         )
@@ -375,12 +383,12 @@ fun FavoriteVerseCardItem(
                                 putExtra(Intent.EXTRA_TEXT, "✨ Sacred Gita Teaching ✨\n\n${item.citation}\n${item.sanskrit}\n\nMeaning:\n${item.translation}")
                                 type = "text/plain"
                             }
-                            context.startActivity(Intent.createChooser(sendIntent, "Share Verse"))
+                            context.startActivity(Intent.createChooser(sendIntent, strings.shareVerse))
                         }
                     ) {
                         Icon(
                             imageVector = Icons.Default.Share,
-                            contentDescription = "Share",
+                            contentDescription = strings.shareVerse,
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(20.dp)
                         )

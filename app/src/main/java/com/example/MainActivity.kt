@@ -58,6 +58,7 @@ import com.example.ui.screens.CollectionScreen
 import com.example.ui.screens.DailyDarshanScreen
 import com.example.ui.screens.MeditationScreen
 import com.example.ui.theme.GitaWisdomTheme
+import com.example.ui.util.GitaUiTranslations
 import com.example.ui.viewmodel.GitaViewModel
 import kotlinx.coroutines.launch
 
@@ -82,6 +83,7 @@ fun GitaApp(viewModel: GitaViewModel = viewModel()) {
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
+    val strings = GitaUiTranslations.get(selectedLanguage)
 
     var showLanguageDialog by remember { mutableStateOf(false) }
     var showProfileDialog by remember { mutableStateOf(false) }
@@ -106,6 +108,7 @@ fun GitaApp(viewModel: GitaViewModel = viewModel()) {
     if (showProfileDialog) {
         UserProfileDialog(
             initialProfile = userProfile,
+            selectedLanguage = selectedLanguage,
             onSaveProfile = { updated ->
                 viewModel.updateUserProfile(updated)
             },
@@ -188,12 +191,12 @@ fun GitaApp(viewModel: GitaViewModel = viewModel()) {
                             icon = {
                                 Icon(
                                     imageVector = if (currentTab == 0) Icons.Filled.AutoAwesome else Icons.Outlined.AutoAwesome,
-                                    contentDescription = "Guidance Chat"
+                                    contentDescription = strings.navGuidance
                                 )
                             },
                             label = {
                                 Text(
-                                    text = "Guidance",
+                                    text = strings.navGuidance,
                                     fontWeight = if (currentTab == 0) FontWeight.Bold else FontWeight.Normal
                                 )
                             },
@@ -211,12 +214,12 @@ fun GitaApp(viewModel: GitaViewModel = viewModel()) {
                             icon = {
                                 Icon(
                                     imageVector = if (currentTab == 1) Icons.Filled.WbSunny else Icons.Outlined.WbSunny,
-                                    contentDescription = "Daily Darshan"
+                                    contentDescription = strings.navDarshan
                                 )
                             },
                             label = {
                                 Text(
-                                    text = "Darshan",
+                                    text = strings.navDarshan,
                                     fontWeight = if (currentTab == 1) FontWeight.Bold else FontWeight.Normal
                                 )
                             },
@@ -234,12 +237,12 @@ fun GitaApp(viewModel: GitaViewModel = viewModel()) {
                             icon = {
                                 Icon(
                                     imageVector = if (currentTab == 2) Icons.Filled.Bookmarks else Icons.Outlined.Bookmarks,
-                                    contentDescription = "Collection"
+                                    contentDescription = strings.navCollections
                                 )
                             },
                             label = {
                                 Text(
-                                    text = "Collection",
+                                    text = strings.navCollections,
                                     fontWeight = if (currentTab == 2) FontWeight.Bold else FontWeight.Normal
                                 )
                             },
@@ -257,12 +260,12 @@ fun GitaApp(viewModel: GitaViewModel = viewModel()) {
                             icon = {
                                 Icon(
                                     imageVector = if (currentTab == 3) Icons.Filled.SelfImprovement else Icons.Outlined.SelfImprovement,
-                                    contentDescription = "Meditate"
+                                    contentDescription = strings.navMeditate
                                 )
                             },
                             label = {
                                 Text(
-                                    text = "Meditate",
+                                    text = strings.navMeditate,
                                     fontWeight = if (currentTab == 3) FontWeight.Bold else FontWeight.Normal
                                 )
                             },
@@ -290,9 +293,11 @@ fun GitaApp(viewModel: GitaViewModel = viewModel()) {
                 )
                 2 -> CollectionScreen(
                     viewModel = viewModel,
+                    selectedLanguage = selectedLanguage,
                     modifier = Modifier.padding(innerPadding)
                 )
                 3 -> MeditationScreen(
+                    selectedLanguage = selectedLanguage,
                     modifier = Modifier.padding(innerPadding)
                 )
             }

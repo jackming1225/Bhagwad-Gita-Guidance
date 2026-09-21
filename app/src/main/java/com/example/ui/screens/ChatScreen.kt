@@ -77,6 +77,7 @@ import com.example.ui.components.GeminiBrandBrush
 import com.example.ui.components.GeminiSparkle
 import com.example.ui.components.GeminiSparkleAvatar
 import com.example.ui.components.VerseCard
+import com.example.ui.util.GitaUiTranslations
 import com.example.ui.viewmodel.GitaViewModel
 
 @OptIn(ExperimentalTextApi::class)
@@ -95,6 +96,8 @@ fun ChatScreen(
     val currentUtteranceId by viewModel.currentUtteranceId.collectAsState()
     val userProfile by viewModel.userProfile.collectAsState()
     val hasAnsweredFirstQuestion by viewModel.hasAnsweredFirstQuestion.collectAsState()
+
+    val strings = GitaUiTranslations.get(selectedLanguage)
 
     var inputText by remember { mutableStateOf("") }
     val listState = rememberLazyListState()
@@ -165,7 +168,7 @@ fun ChatScreen(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Text(
-                                        text = "✨ Return to Ask Need",
+                                        text = "✨ ${strings.chatHeroHeading}",
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.primary,
                                         fontWeight = FontWeight.SemiBold
@@ -179,6 +182,7 @@ fun ChatScreen(
                         ChatMessageItem(
                             message = message,
                             userProfile = userProfile,
+                            selectedLanguage = selectedLanguage,
                             isFavorited = favorites.any { it.citation == message.verseCitation },
                             isSpeaking = isSpeaking && currentUtteranceId == "msg_${message.id}",
                             onToggleFavorite = {
@@ -209,7 +213,10 @@ fun ChatScreen(
 
                     if (isTyping) {
                         item {
-                            GeminiTypingIndicator(userName = userProfile.name)
+                            GeminiTypingIndicator(
+                                userName = userProfile.name,
+                                selectedLanguage = selectedLanguage
+                            )
                         }
                     }
                 }
@@ -249,6 +256,8 @@ fun AskNeedHomeScreen(
     onSelectTopic: (LifeTopic) -> Unit,
     onOpenProfile: () -> Unit
 ) {
+    val strings = GitaUiTranslations.get(selectedLanguage)
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -272,7 +281,7 @@ fun AskNeedHomeScreen(
 
         // Greeting with seeker's name
         Text(
-            text = "Namaste, ${userProfile.name.ifBlank { "Seeker" }}",
+            text = "${strings.greetingNamaste}, ${userProfile.name.ifBlank { "Seeker" }}",
             style = TextStyle(
                 brush = GeminiBrandBrush,
                 fontSize = 28.sp,
@@ -286,11 +295,7 @@ fun AskNeedHomeScreen(
 
         // Prompt asking the need
         Text(
-            text = when (selectedLanguage) {
-                GitaLanguage.HINDI -> "आज आपके मन में क्या प्रश्न अथवा दुविधा है?"
-                GitaLanguage.SANSKRIT -> "अद्य तव मनसि कः संशयः वर्तते?"
-                else -> "What guidance do you seek today?"
-            },
+            text = strings.chatHeroHeading,
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface,
@@ -300,7 +305,7 @@ fun AskNeedHomeScreen(
         Spacer(modifier = Modifier.height(10.dp))
 
         Text(
-            text = "Share any struggle with duty, peace of mind, fear, or relationships. Krishna's timeless wisdom will guide you.",
+            text = strings.chatHeroSub,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
@@ -335,11 +340,7 @@ fun AskNeedHomeScreen(
                     onValueChange = onInputTextChanged,
                     placeholder = {
                         Text(
-                            text = when (selectedLanguage) {
-                                GitaLanguage.HINDI -> "अपनी दुविधा या प्रश्न लिखें..."
-                                GitaLanguage.SANSKRIT -> "संशयं लिखतु..."
-                                else -> "Type your question or dilemma..."
-                            },
+                            text = strings.chatInputPlaceholder,
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.65f)
                         )
@@ -396,7 +397,7 @@ fun AskNeedHomeScreen(
 
         // Clean, minimal prompt chips
         Text(
-            text = "Or tap to explore common dilemmas:",
+            text = strings.chatDilemmasHeading,
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             fontWeight = FontWeight.Medium
@@ -404,12 +405,21 @@ fun AskNeedHomeScreen(
 
         Spacer(modifier = Modifier.height(12.dp))
 
+        val promptChips = remember(selectedLanguage) {
+            listOf(
+                Triple("duty", "💼 " + strings.chipFocusWork, LifeTopic.ALL.find { it.id == "duty" } ?: LifeTopic.ALL[0]),
+                Triple("anxiety", "🕊️ " + strings.chipInnerPeace, LifeTopic.ALL.find { it.id == "anxiety" } ?: LifeTopic.ALL[0]),
+                Triple("anger", "🧘 " + strings.chipOvercomingFear, LifeTopic.ALL.find { it.id == "anger" } ?: LifeTopic.ALL[0]),
+                Triple("courage", "🎯 " + strings.chipDecisionMaking, LifeTopic.ALL.find { it.id == "courage" } ?: LifeTopic.ALL[0])
+            )
+        }
+
         FlowRow(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            LifeTopic.ALL.take(4).forEach { topic ->
+            promptChips.forEach { (id, label, topic) ->
                 Surface(
                     shape = RoundedCornerShape(20.dp),
                     color = MaterialTheme.colorScheme.surface,
@@ -422,19 +432,14 @@ fun AskNeedHomeScreen(
                         .padding(horizontal = 4.dp)
                         .clip(RoundedCornerShape(20.dp))
                         .clickable { onSelectTopic(topic) }
-                        .testTag("topic_chip_${topic.id}")
+                        .testTag("topic_chip_$id")
                 ) {
                     Row(
                         modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = when (topic.id) {
-                                "work_stress" -> "💼 "
-                                "overthinking" -> "🕊️ "
-                                "anger" -> "🧘 "
-                                else -> "🎯 "
-                            } + topic.title,
+                            text = label,
                             style = MaterialTheme.typography.labelMedium,
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.onSurface
@@ -459,7 +464,7 @@ fun AskNeedHomeScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "📜 View previous conversation ($pastMessagesCount ${if (pastMessagesCount == 1) "inquiry" else "inquiries"})",
+                        text = "📜 $pastMessagesCount ${strings.chatListening}",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.SemiBold
@@ -490,7 +495,7 @@ fun AskNeedHomeScreen(
                 )
                 Spacer(modifier = Modifier.width(7.dp))
                 Text(
-                    text = "Shri Krishna is online",
+                    text = strings.topBarOnline,
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.onSurface
@@ -513,6 +518,8 @@ fun ChatBottomInputDock(
     onSend: (String) -> Unit,
     onOpenProfile: () -> Unit
 ) {
+    val strings = GitaUiTranslations.get(selectedLanguage)
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -552,11 +559,7 @@ fun ChatBottomInputDock(
                     onValueChange = onInputTextChanged,
                     placeholder = {
                         Text(
-                            text = when (selectedLanguage) {
-                                GitaLanguage.HINDI -> "कृष्ण से प्रश्न पूछें..."
-                                GitaLanguage.SANSKRIT -> "जीवने संशयं पृच्छतु..."
-                                else -> "Ask Krishna anything..."
-                            },
+                            text = strings.chatInputPlaceholder,
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                         )
@@ -615,6 +618,7 @@ fun ChatBottomInputDock(
 fun ChatMessageItem(
     message: ChatMessageEntity,
     userProfile: UserProfileEntity,
+    selectedLanguage: GitaLanguage = GitaLanguage.ENGLISH,
     isFavorited: Boolean,
     isSpeaking: Boolean,
     onToggleFavorite: () -> Unit,
@@ -622,6 +626,7 @@ fun ChatMessageItem(
     onStopAudio: () -> Unit,
     onOpenDakshina: () -> Unit = {}
 ) {
+    val strings = GitaUiTranslations.get(selectedLanguage)
     if (message.isUser) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -748,7 +753,7 @@ fun ChatMessageItem(
                             ) {
                                 Column(modifier = Modifier.padding(10.dp)) {
                                     Text(
-                                        text = "💡 Contemplation for ${userProfile.name}:",
+                                        text = "💡 ${strings.contemplationPrompt} (${userProfile.name}):",
                                         style = MaterialTheme.typography.labelSmall,
                                         fontWeight = FontWeight.Bold,
                                         color = MaterialTheme.colorScheme.primary
@@ -772,7 +777,8 @@ fun ChatMessageItem(
                             )
                             Spacer(modifier = Modifier.height(12.dp))
                             DakshinaNoteCard(
-                                onOfferDakshina = onOpenDakshina
+                                onOfferDakshina = onOpenDakshina,
+                                selectedLanguage = selectedLanguage
                             )
                         }
                     }
@@ -787,8 +793,11 @@ fun ChatMessageItem(
  */
 @Composable
 fun DakshinaNoteCard(
-    onOfferDakshina: () -> Unit
+    onOfferDakshina: () -> Unit,
+    selectedLanguage: GitaLanguage = GitaLanguage.ENGLISH
 ) {
+    val strings = GitaUiTranslations.get(selectedLanguage)
+
     Surface(
         shape = RoundedCornerShape(14.dp),
         color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f),
@@ -802,7 +811,7 @@ fun DakshinaNoteCard(
                 Text(text = "🪔", fontSize = 18.sp)
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "A Note on Dakshina",
+                    text = strings.dakshinaTitle,
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
                     fontStyle = FontStyle.Italic,
@@ -813,7 +822,7 @@ fun DakshinaNoteCard(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "This platform is sustained through the voluntary love and generosity of fellow seekers. If this reflection brought clarity to your heart today, you are warmly invited to offer a modest Dakshina to support our hosting costs and keep this guidance freely accessible to all.",
+                text = strings.dakshinaSub,
                 style = MaterialTheme.typography.bodySmall.copy(lineHeight = 19.sp),
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -838,7 +847,7 @@ fun DakshinaNoteCard(
                     Text(text = "🪔", fontSize = 16.sp)
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Offer Dakshina (Support the Seva)",
+                        text = strings.dakshinaOffer,
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
@@ -850,7 +859,11 @@ fun DakshinaNoteCard(
 }
 
 @Composable
-fun GeminiTypingIndicator(userName: String) {
+fun GeminiTypingIndicator(
+    userName: String,
+    selectedLanguage: GitaLanguage = GitaLanguage.ENGLISH
+) {
+    val strings = GitaUiTranslations.get(selectedLanguage)
     val infiniteTransition = rememberInfiniteTransition(label = "pulse")
     val alpha by infiniteTransition.animateFloat(
         initialValue = 0.4f,
@@ -889,7 +902,7 @@ fun GeminiTypingIndicator(userName: String) {
             ) {
                 GeminiSparkle(size = 14.dp, animated = true)
                 Text(
-                    text = "Shri Krishna is contemplating eternal counsel...",
+                    text = strings.krishnaTyping,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.primary.copy(alpha = alpha),
                     fontWeight = FontWeight.Medium

@@ -88,7 +88,7 @@ val DAKSHINA_TIERS = listOf(
     DakshinaTier(501, 10, "Patron of Wisdom", "Keep wisdom freely accessible", "🙏")
 )
 
-const val UPI_ID = "sunmeh2525@okicici"
+const val UPI_ID = "gitaseva@upi"
 const val UPI_PAYEE_NAME = "Gita Seva"
 
 private fun buildUpiUri(amountInr: Int, note: String = "Gita Seva Dakshina"): Uri {
