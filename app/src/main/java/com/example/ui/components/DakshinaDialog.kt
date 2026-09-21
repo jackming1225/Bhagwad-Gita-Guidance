@@ -17,6 +17,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,35 +26,28 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ContentCopy
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.OpenInNew
-import androidx.compose.material.icons.filled.Spa
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -66,42 +60,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 
-data class DakshinaTier(
-    val amountInr: Int,
-    val amountUsd: Int,
-    val title: String,
-    val subtitle: String,
-    val icon: String
-)
-
-val DAKSHINA_TIERS = listOf(
-    DakshinaTier(51, 1, "Light a Diya", "Keep the lamp burning", "🪔"),
-    DakshinaTier(101, 3, "Offering of Gratitude", "Nourish spiritual clarity", "🌸"),
-    DakshinaTier(251, 5, "Support the Seva", "Sustain community hosting", "✨"),
-    DakshinaTier(501, 10, "Patron of Wisdom", "Keep wisdom freely accessible", "🙏")
-)
-
-const val UPI_ID = "gitaseva@upi"
-const val UPI_PAYEE_NAME = "Gita Seva"
-
-private fun buildUpiUri(amountInr: Int, note: String = "Gita Seva Dakshina"): Uri {
-    return Uri.Builder()
-        .scheme("upi")
-        .authority("pay")
-        .appendQueryParameter("pa", UPI_ID)
-        .appendQueryParameter("pn", UPI_PAYEE_NAME)
-        .appendQueryParameter("tn", note)
-        .appendQueryParameter("am", amountInr.toString())
-        .appendQueryParameter("cu", "INR")
-        .build()
-}
+const val BUY_ME_A_COFFEE_URL = "https://buymeacoffee.com/sunmeh25258"
+const val BUY_ME_A_COFFEE_HANDLE = "buymeacoffee.com/sunmeh25258"
 
 @Composable
 fun DakshinaDialog(
@@ -109,12 +75,8 @@ fun DakshinaDialog(
     onOfferingCompleted: (amount: String) -> Unit = {}
 ) {
     val context = LocalContext.current
-    var selectedTierIndex by remember { mutableIntStateOf(2) } // default 251 / $5
-    var isUsd by remember { mutableStateOf(false) }
-    var isCustomAmount by remember { mutableStateOf(false) }
-    var customAmountText by remember { mutableStateOf("") }
     var hasCompletedOffering by remember { mutableStateOf(false) }
-    var hasCopiedUpi by remember { mutableStateOf(false) }
+    var hasCopiedLink by remember { mutableStateOf(false) }
 
     Dialog(
         onDismissRequest = onDismiss,
@@ -255,150 +217,9 @@ fun DakshinaDialog(
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(18.dp))
 
-                        // Currency Selector Toggle
-                        Row(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(20.dp))
-                                .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
-                                .padding(3.dp),
-                            horizontalArrangement = Arrangement.Center
-                        ) {
-                            CurrencyTab(
-                                label = "₹ INR",
-                                isSelected = !isUsd,
-                                onClick = { isUsd = false }
-                            )
-                            CurrencyTab(
-                                label = "$ USD",
-                                isSelected = isUsd,
-                                onClick = { isUsd = true }
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.height(14.dp))
-
-                        // Offering Tiers
-                        DAKSHINA_TIERS.forEachIndexed { index, tier ->
-                            val isSelected = !isCustomAmount && selectedTierIndex == index
-                            val amountDisplay = if (isUsd) "$${tier.amountUsd}" else "₹${tier.amountInr}"
-
-                            Card(
-                                shape = RoundedCornerShape(14.dp),
-                                colors = CardDefaults.cardColors(
-                                    containerColor = if (isSelected)
-                                        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.6f)
-                                    else
-                                        MaterialTheme.colorScheme.surface
-                                ),
-                                border = BorderStroke(
-                                    width = if (isSelected) 1.5.dp else 1.dp,
-                                    color = if (isSelected)
-                                        MaterialTheme.colorScheme.primary
-                                    else
-                                        MaterialTheme.colorScheme.outline.copy(alpha = 0.15f)
-                                ),
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 4.dp)
-                                    .clip(RoundedCornerShape(14.dp))
-                                    .clickable {
-                                        isCustomAmount = false
-                                        selectedTierIndex = index
-                                    }
-                                    .testTag("dakshina_tier_$index")
-                            ) {
-                                Row(
-                                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text(
-                                        text = tier.icon,
-                                        fontSize = 20.sp
-                                    )
-                                    Spacer(modifier = Modifier.width(12.dp))
-                                    Column(modifier = Modifier.weight(1f)) {
-                                        Text(
-                                            text = tier.title,
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            fontWeight = FontWeight.Bold,
-                                            color = MaterialTheme.colorScheme.onSurface
-                                        )
-                                        Text(
-                                            text = tier.subtitle,
-                                            style = MaterialTheme.typography.labelSmall,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
-                                    }
-                                    Surface(
-                                        shape = RoundedCornerShape(8.dp),
-                                        color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
-                                        modifier = Modifier.padding(start = 8.dp)
-                                    ) {
-                                        Text(
-                                            text = amountDisplay,
-                                            style = MaterialTheme.typography.labelMedium,
-                                            fontWeight = FontWeight.Bold,
-                                            color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
-                                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
-                                        )
-                                    }
-                                }
-                            }
-                        }
-
-                        // Custom Amount Toggle
-                        Card(
-                            shape = RoundedCornerShape(14.dp),
-                            colors = CardDefaults.cardColors(
-                                containerColor = if (isCustomAmount)
-                                    MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.6f)
-                                else
-                                    MaterialTheme.colorScheme.surface
-                            ),
-                            border = BorderStroke(
-                                width = if (isCustomAmount) 1.5.dp else 1.dp,
-                                color = if (isCustomAmount)
-                                    MaterialTheme.colorScheme.primary
-                                else
-                                    MaterialTheme.colorScheme.outline.copy(alpha = 0.15f)
-                            ),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 4.dp)
-                                .clip(RoundedCornerShape(14.dp))
-                                .clickable { isCustomAmount = true }
-                                .testTag("dakshina_tier_custom")
-                        ) {
-                            Column(modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp)) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Text(text = "✍️", fontSize = 18.sp)
-                                    Spacer(modifier = Modifier.width(12.dp))
-                                    Text(
-                                        text = "Custom Voluntary Amount",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        fontWeight = FontWeight.SemiBold,
-                                        color = MaterialTheme.colorScheme.onSurface
-                                    )
-                                }
-                                if (isCustomAmount) {
-                                    Spacer(modifier = Modifier.height(8.dp))
-                                    OutlinedTextField(
-                                        value = customAmountText,
-                                        onValueChange = { customAmountText = it.filter { ch -> ch.isDigit() } },
-                                        label = { Text("Amount (${if (isUsd) "USD $" else "INR ₹"})") },
-                                        singleLine = true,
-                                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .testTag("custom_amount_input")
-                                    )
-                                }
-                            }
-                        }
-
-                        // UPI VPA Info & Quick Copy Card
+                        // Buy Me a Coffee Profile Card & Quick Copy
                         Card(
                             shape = RoundedCornerShape(14.dp),
                             colors = CardDefaults.cardColors(
@@ -408,23 +229,38 @@ fun DakshinaDialog(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(vertical = 4.dp)
+                                .clip(RoundedCornerShape(14.dp))
+                                .clickable {
+                                    try {
+                                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(BUY_ME_A_COFFEE_URL))
+                                        context.startActivity(intent)
+                                        hasCompletedOffering = true
+                                    } catch (e: Exception) {
+                                        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                        val clip = ClipData.newPlainText("Buy Me a Coffee Link", BUY_ME_A_COFFEE_URL)
+                                        clipboard.setPrimaryClip(clip)
+                                        Toast.makeText(context, "Link copied: $BUY_ME_A_COFFEE_HANDLE", Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                                .testTag("buymeacoffee_profile_card")
                         ) {
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(horizontal = 12.dp, vertical = 10.dp),
+                                    .padding(horizontal = 14.dp, vertical = 12.dp),
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Column(modifier = Modifier.weight(1f)) {
                                     Text(
-                                        text = "Official UPI ID",
+                                        text = "☕ Buy Me a Coffee Profile",
                                         style = MaterialTheme.typography.labelSmall,
                                         color = MaterialTheme.colorScheme.primary,
-                                        fontWeight = FontWeight.SemiBold
+                                        fontWeight = FontWeight.Bold
                                     )
+                                    Spacer(modifier = Modifier.height(2.dp))
                                     Text(
-                                        text = UPI_ID,
+                                        text = BUY_ME_A_COFFEE_HANDLE,
                                         style = MaterialTheme.typography.bodyMedium,
                                         fontWeight = FontWeight.Bold,
                                         color = MaterialTheme.colorScheme.onSurface
@@ -433,22 +269,22 @@ fun DakshinaDialog(
                                 OutlinedButton(
                                     onClick = {
                                         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                                        val clip = ClipData.newPlainText("UPI ID", UPI_ID)
+                                        val clip = ClipData.newPlainText("Buy Me a Coffee Link", BUY_ME_A_COFFEE_URL)
                                         clipboard.setPrimaryClip(clip)
-                                        hasCopiedUpi = true
-                                        Toast.makeText(context, "UPI ID copied: $UPI_ID", Toast.LENGTH_SHORT).show()
+                                        hasCopiedLink = true
+                                        Toast.makeText(context, "Link copied: $BUY_ME_A_COFFEE_HANDLE", Toast.LENGTH_SHORT).show()
                                     },
                                     shape = RoundedCornerShape(10.dp),
                                     modifier = Modifier.height(36.dp)
                                 ) {
                                     Icon(
-                                        imageVector = if (hasCopiedUpi) Icons.Default.Check else Icons.Default.ContentCopy,
-                                        contentDescription = "Copy UPI ID",
+                                        imageVector = if (hasCopiedLink) Icons.Default.Check else Icons.Default.ContentCopy,
+                                        contentDescription = "Copy Buy Me a Coffee Link",
                                         modifier = Modifier.size(14.dp)
                                     )
                                     Spacer(modifier = Modifier.width(6.dp))
                                     Text(
-                                        text = if (hasCopiedUpi) "Copied" else "Copy",
+                                        text = if (hasCopiedLink) "Copied" else "Copy",
                                         style = MaterialTheme.typography.labelSmall,
                                         fontWeight = FontWeight.Bold
                                     )
@@ -466,36 +302,21 @@ fun DakshinaDialog(
                             textAlign = TextAlign.Center
                         )
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(18.dp))
 
-                        // Submit Button
-                        val selectedAmountInr = if (isCustomAmount) {
-                            customAmountText.toIntOrNull() ?: 100
-                        } else {
-                            DAKSHINA_TIERS[selectedTierIndex].amountInr
-                        }
-
-                        val selectedAmountStr = if (isCustomAmount) {
-                            if (customAmountText.isNotBlank()) "${if (isUsd) "$" else "₹"}$customAmountText" else "${if (isUsd) "$" else "₹"}100"
-                        } else {
-                            val tier = DAKSHINA_TIERS[selectedTierIndex]
-                            if (isUsd) "$${tier.amountUsd}" else "₹${tier.amountInr}"
-                        }
-
+                        // Primary Action Button (Without truncating text)
                         Button(
                             onClick = {
-                                onOfferingCompleted(selectedAmountStr)
-                                val upiUri = buildUpiUri(selectedAmountInr)
-                                val upiIntent = Intent(Intent.ACTION_VIEW, upiUri)
+                                onOfferingCompleted("Buy Me a Coffee")
                                 try {
-                                    context.startActivity(Intent.createChooser(upiIntent, "Offer Dakshina via UPI"))
+                                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(BUY_ME_A_COFFEE_URL))
+                                    context.startActivity(intent)
                                     hasCompletedOffering = true
                                 } catch (e: Exception) {
-                                    // If no UPI app installed (e.g. desktop/emulator), copy UPI ID and proceed to acknowledgment
                                     val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                                    val clip = ClipData.newPlainText("UPI ID", UPI_ID)
+                                    val clip = ClipData.newPlainText("Buy Me a Coffee Link", BUY_ME_A_COFFEE_URL)
                                     clipboard.setPrimaryClip(clip)
-                                    Toast.makeText(context, "UPI ID copied: $UPI_ID", Toast.LENGTH_LONG).show()
+                                    Toast.makeText(context, "Link copied: $BUY_ME_A_COFFEE_HANDLE", Toast.LENGTH_LONG).show()
                                     hasCompletedOffering = true
                                 }
                             },
@@ -503,34 +324,36 @@ fun DakshinaDialog(
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = MaterialTheme.colorScheme.primary
                             ),
+                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(50.dp)
+                                .heightIn(min = 52.dp)
                                 .testTag("confirm_dakshina_button")
                         ) {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.Center
                             ) {
-                                Text(text = "🪔", fontSize = 18.sp)
+                                Text(text = "☕", fontSize = 18.sp)
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
-                                    text = "Pay via UPI ($selectedAmountStr)",
-                                    style = MaterialTheme.typography.bodyMedium,
+                                    text = "Support on Buy Me a Coffee",
+                                    style = MaterialTheme.typography.titleSmall,
                                     fontWeight = FontWeight.Bold,
-                                    color = Color.White
+                                    color = Color.White,
+                                    textAlign = TextAlign.Center
                                 )
-                                Spacer(modifier = Modifier.width(6.dp))
+                                Spacer(modifier = Modifier.width(8.dp))
                                 Icon(
-                                    imageVector = Icons.Default.OpenInNew,
-                                    contentDescription = "Open UPI",
+                                    imageVector = Icons.AutoMirrored.Filled.OpenInNew,
+                                    contentDescription = "Open Buy Me a Coffee",
                                     tint = Color.White,
                                     modifier = Modifier.size(16.dp)
                                 )
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(6.dp))
+                        Spacer(modifier = Modifier.height(8.dp))
 
                         TextButton(
                             onClick = onDismiss,
@@ -546,29 +369,6 @@ fun DakshinaDialog(
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun CurrencyTab(
-    label: String,
-    isSelected: Boolean,
-    onClick: () -> Unit
-) {
-    Surface(
-        shape = RoundedCornerShape(16.dp),
-        color = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
-        modifier = Modifier
-            .clip(RoundedCornerShape(16.dp))
-            .clickable { onClick() }
-    ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelMedium,
-            fontWeight = FontWeight.Bold,
-            color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp)
-        )
     }
 }
 
@@ -618,7 +418,7 @@ fun DakshinaConfirmationView(
         Spacer(modifier = Modifier.height(14.dp))
 
         Text(
-            text = "May peace, equanimity (Samatvam), and divine grace illuminate your path. Your voluntary offering honors the sacred bond of wisdom and helps keep this eternal guidance freely accessible for fellow seekers around the world.",
+            text = "May peace, equanimity (Samatvam), and divine grace illuminate your path. Your voluntary support on Buy Me a Coffee honors the sacred bond of wisdom and helps keep this eternal guidance freely accessible for fellow seekers around the world.",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
